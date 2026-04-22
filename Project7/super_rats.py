@@ -58,3 +58,34 @@ def mutate(children, mutate_odds, mutate_min, mutate_max):
         if mutate_odds >= random.random():
             children[index] = round(rat * random.uniform(mutate_min, mutate_max))
     return children
+
+def main():
+    """Initialize population, select, breed, and mutate, display results."""
+    generations = 0
+    parents = populate(num_rats, initial_min_weight, initial_max_weight, initial_mode_weight)
+    print("Initial population weights = {}".format(parents))
+    popl_fitness = fitness(parents, goal)
+    print("Initial population fitness = {}".format(popl_fitness))
+    print("Number to retain = {}".format(num_rats))
+
+    ave_wt = []
+
+    while popl_fitness < 1 and generations < generation_limit:
+        selected_males, selected_females = select(parents, num_rats)
+        children = breed(selected_males, selected_females, litter_size)
+        children = mutate(children, mutate_odds, mutate_min, mutate_max)
+        parents = selected_males + selected_females + children
+        popl_fitness = fitness(parents, goal)
+        print("Generation {} fitness = {:.4f}".format(generations, popl_fitness))
+        ave_wt.append(int(statistics.mean(parents)))
+        generations += 1
+        print("Average weight per generation = {}".format(ave_wt))
+        print("\nNumber of generations = {}".format(generations))
+        print("Number of years = {}".format(int(generations / litters_per_year)))
+
+if __name__ == '__main__':
+    start_time = time.time()
+    main()
+    end_time = time.time()
+    duration = end_time - start_time
+    print("\nRuntime for this program was {} seconds".format(duration))
